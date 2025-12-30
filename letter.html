@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thư gửi em</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Patrick+Hand&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* =========================================
+           CSS CĂN CHỈNH DÒNG KẺ CHUẨN XÁC
+           ========================================= */
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #5d4037;
+        background-image: repeating-linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.03) 0px,
+            rgba(255, 255, 255, 0.03) 2px,
+            transparent 2px,
+            transparent 10px
+          ),
+          repeating-linear-gradient(
+            -45deg,
+            rgba(0, 0, 0, 0.05) 0px,
+            rgba(0, 0, 0, 0.05) 2px,
+            transparent 2px,
+            transparent 10px
+          );
+        font-family: "Segoe UI", sans-serif;
+        padding: 20px;
+      }
+
+      .desk-background {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      /* Tờ giấy viết thư */
+      .paper-container {
+        background-color: #fdf6e3;
+        width: 100%;
+        max-width: 600px;
+
+        /* --- CẤU HÌNH DÒNG KẺ --- */
+        /* Tạo dòng kẻ ngang màu xám nhạt */
+        background-image: linear-gradient(
+          rgba(0, 0, 0, 0.15) 1px,
+          transparent 1px
+        );
+        /* Khoảng cách giữa các dòng là 35px */
+        background-size: 100% 35px;
+
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        position: relative;
+        transform: rotate(-2deg);
+        margin-bottom: 30px;
+
+        /* Padding top căn chỉnh để dòng đầu tiên rơi đúng nhịp */
+        padding: 55px 60px 40px 60px;
+      }
+
+      /* Cây bút trang trí */
+      .pen-deco {
+        position: absolute;
+        top: 20px;
+        right: -80px;
+        width: 150px;
+        transform: rotate(45deg);
+        filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.3));
+        pointer-events: none;
+        z-index: 10;
+      }
+      .pen-deco img {
+        width: 100%;
+        display: block;
+      }
+
+      /* Nội dung thư */
+      .letter-content {
+        font-family: "Dancing Script", cursive;
+        color: #2c3e50;
+        font-size: 1.6rem;
+
+        /* QUAN TRỌNG: Chiều cao dòng chữ bằng chiều cao dòng kẻ nền */
+        line-height: 35px;
+      }
+
+      .letter-content h1 {
+        text-align: center;
+        font-size: 2.2rem;
+        color: #c0392b;
+        margin-bottom: 35px; /* Cách 1 dòng */
+        margin-top: -10px;
+        line-height: 35px;
+      }
+
+      .letter-content p {
+        margin-bottom: 0;
+        text-indent: 1.5em;
+
+        /* --- CHỈNH VỊ TRÍ CHỮ Ở ĐÂY --- */
+        position: relative;
+        /* Top âm (-2px) để nhấc chữ lên trên dòng kẻ một chút */
+        /* Top dương (6px) sẽ đẩy chữ đè xuống dòng kẻ */
+        top: -2px;
+      }
+
+      .signature {
+        margin-top: 70px; /* Cách 2 dòng */
+        text-align: right;
+        padding-right: 20px;
+        font-weight: bold;
+        line-height: 35px;
+      }
+
+      /* Nút quay lại */
+      .back-button {
+        display: inline-block;
+        padding: 12px 30px;
+        background: #e91e63;
+        color: white;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s;
+        border: 2px solid white;
+      }
+      .back-button:hover {
+        transform: scale(1.1);
+        background: #c2185b;
+      }
+
+      @media (max-width: 768px) {
+        .paper-container {
+          padding: 55px 20px 40px 20px;
+          transform: rotate(0deg);
+        }
+        .pen-deco {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="desk-background">
+      <div class="paper-container">
+        <div class="pen-deco">
+          <img
+            src="https://purepng.com/public/uploads/large/purepng.com-fountain-penfountain-pennib-penink-penfountain-14215264627993s7t2.png"
+            alt="pen"
+          />
+        </div>
+
+        <div class="letter-content">
+          <h1>Gửi Ủn ỉn của anh ...</h1>
+
+          <p>
+            Chúc em một ngày thật vui vẻ, một năm thật hạnh phúc và tràn ngập
+            niềm vui!
+          </p>
+
+          <p>
+            Hôm nay là một ngày đặc biệt - ngày đầu tiên của năm 2026, anh muốn
+            gửi tới Ủn Ỉn của anh một số lời tâm sự.
+          </p>
+          <p>
+            Năm vừa qua, chúng ta đã cùng nhau trải qua biết bao khoảnh khắc
+            đáng nhớ. Từ những buổi hẹn bên nhau, những chuyến đi chơi vui vẻ,
+            đến những lúc cùng nhau vượt qua khó khăn. Mỗi kỷ niệm đều in đậm
+            trong tim anh.
+          </p>
+          <p>
+            Cảm ơn em đã bước vào cuộc đời anh, biến những ngày tẻ nhạt trở nên
+            rực rỡ. Cảm ơn em vì đã không vì những nổi buồn anh gây ra cho em mà
+            rời đi.Mỗi khoảnh khắc bên em đều là một trang nhật ký đẹp mà anh
+            muốn lưu giữ mãi.
+          </p>
+
+          <p>
+            Anh biết mình còn nhiều thiếu sót, nhưng vì em, anh sẽ cố gắng tốt
+            hơn mỗi ngày. Mong rằng sau này, dù mưa hay nắng, chúng ta vẫn sẽ
+            nắm chặt tay nhau như bây giờ nhé.
+          </p>
+
+          <p>Iuuuu nhắm Ủn Ỉn ụt ịt của anhhhhh!</p>
+
+          <div class="signature">
+            <p>Đồ đáng ghét của em.</p>
+            <p>NVT - Dzai</p>
+          </div>
+        </div>
+      </div>
+      <audio id="my-audio" loop>
+        <source src="assets/Mucsic/River Flows In You.mp3" type="audio/mpeg" />
+      </audio>
+
+      <button id="music-btn" onclick="toggleMusic()">🎵</button>
+
+      <style>
+        #music-btn {
+          position: fixed;
+          bottom: 20px;
+          left: 20px;
+          z-index: 9999; /* Luôn nổi lên trên cùng */
+          width: 50px;
+          height: 50px;
+          background: rgba(255, 255, 255, 0.8);
+          border: 2px solid #e91e63;
+          border-radius: 50%;
+          font-size: 24px;
+          cursor: pointer;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+          transition: all 0.3s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: spin 3s linear infinite; /* Xoay tròn khi hát */
+          animation-play-state: paused; /* Mặc định đứng yên */
+        }
+
+        #music-btn:hover {
+          transform: scale(1.1);
+          background: #fff;
+        }
+
+        @keyframes spin {
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+      </style>
+
+      <script>
+        const audio = document.getElementById("my-audio");
+        const btn = document.getElementById("music-btn");
+
+        // --- HÀM 1: KHÔI PHỤC TRẠNG THÁI NHẠC TỪ TRANG TRƯỚC ---
+        window.addEventListener("DOMContentLoaded", () => {
+          // Lấy thời gian đã phát từ bộ nhớ
+          const savedTime = localStorage.getItem("musicTime");
+          const isPlaying = localStorage.getItem("musicPlaying");
+
+          if (savedTime) {
+            audio.currentTime = parseFloat(savedTime);
+          }
+
+          // Nếu trạng thái là đang phát -> Tự động phát tiếp
+          // (Lưu ý: Trình duyệt có thể chặn nếu chưa click, ta sẽ xử lý ở dưới)
+          if (isPlaying === "true") {
+            audio
+              .play()
+              .then(() => {
+                btn.style.animationPlayState = "running";
+                btn.innerHTML = "🎵";
+              })
+              .catch(() => {
+                console.log(
+                  "Trình duyệt chặn Autoplay, chờ người dùng click..."
+                );
+              });
+          } else {
+            btn.style.animationPlayState = "paused";
+            btn.innerHTML = "🔇"; // Biểu tượng tắt tiếng
+          }
+        });
+
+        // --- HÀM 2: LƯU THỜI GIAN KHI CHUYỂN TRANG ---
+        window.addEventListener("beforeunload", () => {
+          localStorage.setItem("musicTime", audio.currentTime);
+          localStorage.setItem("musicPlaying", !audio.paused);
+        });
+
+        // --- HÀM 3: BẬT/TẮT NHẠC KHI BẤM NÚT ---
+        function toggleMusic() {
+          if (audio.paused) {
+            audio.play();
+            btn.style.animationPlayState = "running";
+            btn.innerHTML = "🎵";
+            localStorage.setItem("musicPlaying", "true");
+          } else {
+            audio.pause();
+            btn.style.animationPlayState = "paused";
+            btn.innerHTML = "🔇";
+            localStorage.setItem("musicPlaying", "false");
+          }
+        }
+
+        // --- HÀM 4: CLICK BẤT KỲ ĐÂU ĐỂ MỒI NHẠC (FIX LỖI CHROME) ---
+        // Chrome chặn tự phát nhạc nếu chưa tương tác.
+        // Hàm này giúp nhạc tự bật ngay khi bạn chạm vào màn hình lần đầu.
+        document.body.addEventListener(
+          "click",
+          () => {
+            if (
+              localStorage.getItem("musicPlaying") !== "false" &&
+              audio.paused
+            ) {
+              audio.play();
+              btn.style.animationPlayState = "running";
+              btn.innerHTML = "🎵";
+            }
+          },
+          { once: true }
+        ); // Chỉ chạy 1 lần duy nhất
+      </script>
+      <a href="index.html" class="back-button">← Quay về Tim 3D</a>
+    </div>
+  </body>
+</html>

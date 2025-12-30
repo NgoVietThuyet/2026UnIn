@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Particle Heart</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="ui-layer">
+      <h1>Ủn ỉn nhấn vào đi💗</h1>
+    </div>
+
+    <canvas id="heartCanvas"></canvas>
+
+    <div id="gallery-overlay" class="hidden">
+      <div class="gallery-content">
+        <h2>Kỷ niệm của chúng ta</h2>
+        <div class="photo-grid" id="photo-grid"></div>
+        <a href="letter.html" class="letter-button">Bức thư tặng Ủn ỉn 💌</a>
+        <button id="close-gallery">Quay lại</button>
+      </div>
+    </div>
+    <audio id="my-audio" loop>
+      <source src="assets/Mucsic/River Flows In You.mp3" type="audio/mpeg" />
+    </audio>
+
+    <button id="music-btn" onclick="toggleMusic()">🎵</button>
+
+    <style>
+      #music-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 9999; /* Luôn nổi lên trên cùng */
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.8);
+        border: 2px solid #e91e63;
+        border-radius: 50%;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: spin 3s linear infinite; /* Xoay tròn khi hát */
+        animation-play-state: paused; /* Mặc định đứng yên */
+      }
+
+      #music-btn:hover {
+        transform: scale(1.1);
+        background: #fff;
+      }
+
+      @keyframes spin {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+
+    <script>
+      const audio = document.getElementById("my-audio");
+      const btn = document.getElementById("music-btn");
+
+      // --- HÀM 1: KHÔI PHỤC TRẠNG THÁI NHẠC TỪ TRANG TRƯỚC ---
+      window.addEventListener("DOMContentLoaded", () => {
+        // Lấy thời gian đã phát từ bộ nhớ
+        const savedTime = localStorage.getItem("musicTime");
+        const isPlaying = localStorage.getItem("musicPlaying");
+
+        if (savedTime) {
+          audio.currentTime = parseFloat(savedTime);
+        }
+
+        // Nếu trạng thái là đang phát -> Tự động phát tiếp
+        // (Lưu ý: Trình duyệt có thể chặn nếu chưa click, ta sẽ xử lý ở dưới)
+        if (isPlaying === "true") {
+          audio
+            .play()
+            .then(() => {
+              btn.style.animationPlayState = "running";
+              btn.innerHTML = "🎵";
+            })
+            .catch(() => {
+              console.log("Trình duyệt chặn Autoplay, chờ người dùng click...");
+            });
+        } else {
+          btn.style.animationPlayState = "paused";
+          btn.innerHTML = "🔇"; // Biểu tượng tắt tiếng
+        }
+      });
+
+      // --- HÀM 2: LƯU THỜI GIAN KHI CHUYỂN TRANG ---
+      window.addEventListener("beforeunload", () => {
+        localStorage.setItem("musicTime", audio.currentTime);
+        localStorage.setItem("musicPlaying", !audio.paused);
+      });
+
+      // --- HÀM 3: BẬT/TẮT NHẠC KHI BẤM NÚT ---
+      function toggleMusic() {
+        if (audio.paused) {
+          audio.play();
+          btn.style.animationPlayState = "running";
+          btn.innerHTML = "🎵";
+          localStorage.setItem("musicPlaying", "true");
+        } else {
+          audio.pause();
+          btn.style.animationPlayState = "paused";
+          btn.innerHTML = "🔇";
+          localStorage.setItem("musicPlaying", "false");
+        }
+      }
+
+      // --- HÀM 4: CLICK BẤT KỲ ĐÂU ĐỂ MỒI NHẠC (FIX LỖI CHROME) ---
+      // Chrome chặn tự phát nhạc nếu chưa tương tác.
+      // Hàm này giúp nhạc tự bật ngay khi bạn chạm vào màn hình lần đầu.
+      document.body.addEventListener(
+        "click",
+        () => {
+          if (
+            localStorage.getItem("musicPlaying") !== "false" &&
+            audio.paused
+          ) {
+            audio.play();
+            btn.style.animationPlayState = "running";
+            btn.innerHTML = "🎵";
+          }
+        },
+        { once: true }
+      ); // Chỉ chạy 1 lần duy nhất
+    </script>
+    <script src="script.js"></script>
+  </body>
+</html>

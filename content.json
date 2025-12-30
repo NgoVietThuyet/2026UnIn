@@ -1,0 +1,44 @@
+{
+  "password_mode": "plain_or_hash",
+  "password_plain": "un in",
+  "password_hint": "2 chữ, biệt danh cute của em (không dấu cũng được)",
+  "password_salt": "piggy-2026",
+  "password_hash_fnv1a": "8fba5d4e",
+  "nicknames": ["ủn ỉn", "bé heo", "cục bông hồng", "công chúa heo con"],
+  "bgm": {
+    "src": "assets/audio/song1.mp3",
+    "title": "BGM - Pink Night",
+    "artist": "Us"
+  },
+  "images": [
+    { "src": "assets/img/img1.jpg", "caption": "Ngày đó… em cười một cái là tim anh “đứng hình” 💗" },
+    { "src": "assets/img/img2.jpg", "caption": "Nụ cười đó… là “màu hồng” của anh 🐷✨" },
+    { "src": "assets/img/img3.jpg", "caption": "Một buổi nhỏ thôi… mà nhớ hoài 😳" },
+    { "src": "assets/img/img4.jpg", "caption": "Cùng nhau đi, cùng nhau lớn lên 🌷" },
+    { "src": "assets/img/img5.jpg", "caption": "Em là lý do anh muốn cố gắng mỗi ngày 🫶" },
+    { "src": "assets/img/img6.jpg", "caption": "Đôi khi chẳng cần gì nhiều… chỉ cần em ở đây 🥺" },
+    { "src": "assets/img/img7.jpg", "caption": "Một tấm hình – một kỷ niệm – một thương thương 💞" },
+    { "src": "assets/img/img8.jpg", "caption": "2026 mình vẫn nắm tay nhau nha 🐷💗" }
+  ],
+  "videos": [
+    { "type": "local", "src": "assets/video/vid1.mp4", "title": "Video kỷ niệm (local mp4)" },
+    { "type": "youtube", "src": "dQw4w9WgXcQ", "title": "YouTube (ID video) - thay bằng video của tụi mình" }
+  ],
+  "audios": [
+    { "src": "assets/audio/song1.mp3", "title": "Bài hát của tụi mình (1)", "artist": "Us" },
+    { "src": "assets/audio/song2.mp3", "title": "Bài hát của tụi mình (2)", "artist": "Us" },
+    { "src": "assets/audio/voice1.mp3", "title": "Voice message: 'Nhớ em'", "artist": "Anh" }
+  ],
+  "messages": [
+    "Chúc bé heo của anh một năm 2026 thật rực rỡ và bình yên.",
+    "Mong em luôn khỏe, luôn cười nhiều, và luôn được yêu thương đúng cách.",
+    "Nếu có ngày em mệt, cứ dựa vào anh một chút—anh ở đây, không đi đâu hết.",
+    "2026 mình cùng nhau đi chậm thôi, nhưng đi cùng nhau nha ủn ỉn.",
+    "Cảm ơn em vì đã xuất hiện và làm thế giới của anh “màu hồng” hơn.",
+    "Chúc mừng năm mới, người anh thương nhất. 🐷💗"
+  ],
+  "pig_icons": [
+    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'><defs><radialGradient id='g' cx='35%25' cy='25%25'><stop offset='0' stop-color='%23fff'/><stop offset='1' stop-color='%23ff7ec7'/></radialGradient></defs><circle cx='110' cy='110' r='92' fill='url(%23g)' stroke='%23ffffff' stroke-width='8'/><ellipse cx='110' cy='135' rx='55' ry='38' fill='%23ffb3da' stroke='%23ffffff' stroke-width='6'/><circle cx='90' cy='130' r='9' fill='%238b2a5e'/><circle cx='130' cy='130' r='9' fill='%238b2a5e'/><circle cx='70' cy='85' r='18' fill='%23ff9fd2' stroke='%23ffffff' stroke-width='6'/><circle cx='150' cy='85' r='18' fill='%23ff9fd2' stroke='%23ffffff' stroke-width='6'/><circle cx='80' cy='105' r='7' fill='%238b2a5e'/><circle cx='140' cy='105' r='7' fill='%238b2a5e'/><path d='M94 156c10 10 22 10 32 0' fill='none' stroke='%23ffffff' stroke-width='6' stroke-linecap='round'/><path d='M168 62c12-10 20-12 28-10' fill='none' stroke='%23ffffff' stroke-width='6' stroke-linecap='round'/></svg>",
+    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'><circle cx='110' cy='110' r='92' fill='%23ff90cd' stroke='%23ffffff' stroke-width='8'/><ellipse cx='110' cy='140' rx='58' ry='40' fill='%23ffd1ea' stroke='%23ffffff' stroke-width='6'/><circle cx='92' cy='140' r='9' fill='%238b2a5e'/><circle cx='128' cy='140' r='9' fill='%238b2a5e'/><path d='M70 92c10-18 30-18 40 0' fill='none' stroke='%238b2a5e' stroke-width='7' stroke-linecap='round'/><path d='M110 92c10-18 30-18 40 0' fill='none' stroke='%238b2a5e' stroke-width='7' stroke-linecap='round'/><path d='M92 168c12 10 24 10 36 0' fill='none' stroke='%23ffffff' stroke-width='6' stroke-linecap='round'/><circle cx='70' cy='78' r='18' fill='%23ffb3da' stroke='%23ffffff' stroke-width='6'/><circle cx='150' cy='78' r='18' fill='%23ffb3da' stroke='%23ffffff' stroke-width='6'/></svg>"
+  ]
+}
