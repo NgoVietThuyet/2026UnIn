@@ -2,16 +2,16 @@
    CẤU HÌNH & DATA
    ========================================= */
 
-// Tự động lấy 50 ảnh từ thư mục assets/IMG/
+// Tự động lấy ảnh từ thư mục assets/IMG/
 const IMAGES = [];
 const TOTAL_IMAGES = 78;
-for (let i = 1; i <= TOTAL_IMAGES; i++) {
-  IMAGES.push(`assets/IMG/${i}.jpg`);
-}
+for (let i = 1; i <= TOTAL_IMAGES; i++) IMAGES.push(`assets/IMG/${i}.jpg`);
 
-// CẤU HÌNH TIM "SIÊU ĐẶC"
-const PARTICLE_COUNT = 15000; // Số lượng hạt lớn để tim đặc khít
-const HEART_SIZE = 250; // Kích thước tim
+// CẤU HÌNH TIM (auto scale theo màn hình trong resize())
+let PARTICLE_COUNT = 12000;
+let HEART_SIZE = 250;
+let CLICK_RADIUS = 250;
+
 // Màu Đỏ Ruby Thẫm
 const HEART_COLOR = { r: 180, g: 0, b: 50 };
 
@@ -20,32 +20,152 @@ const HEART_COLOR = { r: 180, g: 0, b: 50 };
    ========================================= */
 
 const canvas = document.getElementById("heartCanvas");
-const ctx = canvas.getContext("2d");
+const ctx = canvas.getContext("2d", { alpha: true });
+
 const uiLayer = document.getElementById("ui-layer");
 const galleryOverlay = document.getElementById("gallery-overlay");
 const photoGrid = document.getElementById("photo-grid");
 const closeBtn = document.getElementById("close-gallery");
 
-let width, height;
+let width, height; // CSS px (logic + draw)
 let particles = [];
 let fireworks = [];
-let mouse = { x: 0, y: 0 };
+let mouse = { x: 0, y: 0 }; // CSS px
 let isGalleryOpen = false;
 
-// Camera
+// Camera / 3D
 let rotationAngle = 0;
 let perspective = 1000;
 let heartState = "assemble";
 
 const random = (min, max) => Math.random() * (max - min) + min;
 
+let dpr = 1;
+
+// ===== Lightbox (phóng to ảnh) =====
+let lightbox, lightboxImg, lightboxCloseBtn;
+
+// Tạo lightbox + inject CSS (để khỏi phải sửa HTML/CSS)
+function setupLightbox() {
+  // Inject CSS
+  const style = document.createElement("style");
+  style.textContent = `
+    .photo-card img{ cursor: zoom-in; }
+
+    #lightbox{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.78);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      padding: 18px;
+    }
+    #lightbox.show{ display:flex; }
+
+    #lightbox img{
+      max-width: min(94vw, 980px);
+      max-height: 88vh;
+      border-radius: 14px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      background: #fff;
+    }
+
+    #lightbox .lb-close{
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.14);
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Create DOM
+  lightbox = document.createElement("div");
+  lightbox.id = "lightbox";
+  lightbox.innerHTML = `
+    <button class="lb-close" type="button" aria-label="Đóng">✕</button>
+    <img id="lightbox-img" alt="preview" />
+  `;
+  document.body.appendChild(lightbox);
+
+  lightboxImg = lightbox.querySelector("#lightbox-img");
+  lightboxCloseBtn = lightbox.querySelector(".lb-close");
+
+  function closeLightbox() {
+    lightbox.classList.remove("show");
+    lightboxImg.src = "";
+  }
+
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  lightboxCloseBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    closeLightbox();
+  });
+
+  // click ảnh trong gallery -> mở lightbox
+  photoGrid.addEventListener("click", (e) => {
+    const img = e.target.closest("img");
+    if (!img) return;
+    e.stopPropagation(); // không cho click lan ra overlay
+    lightboxImg.src = img.src;
+    lightbox.classList.add("show");
+  });
+}
+
+/* =========================================
+   RESIZE (nét trên mobile + auto scale tim)
+   ========================================= */
 function resize() {
-  width = canvas.width = window.innerWidth;
-  height = canvas.height = window.innerHeight;
+  dpr = Math.min(2, window.devicePixelRatio || 1);
+
+  // Logic & tọa độ dùng CSS px
+  width = window.innerWidth;
+  height = window.innerHeight;
+
+  // Canvas buffer theo DPR để nét
+  canvas.width = Math.floor(width * dpr);
+  canvas.height = Math.floor(height * dpr);
+  canvas.style.width = width + "px";
+  canvas.style.height = height + "px";
+
+  // Scale hệ tọa độ để vẽ bằng CSS px
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
   mouse.x = width / 2;
   mouse.y = height / 2;
+
+  // Auto scale tim theo màn
+  const minSide = Math.min(width, height);
+
+  HEART_SIZE = Math.round(minSide * 0.33);
+  HEART_SIZE = Math.max(140, Math.min(280, HEART_SIZE));
+
+  // Mobile: ít hạt hơn để mượt + nhìn không bể
+  PARTICLE_COUNT = minSide < 600 ? 7000 : 12000;
+
+  CLICK_RADIUS = HEART_SIZE * 1.05;
+
+  // perspective hơi theo màn để đẹp
+  perspective = minSide < 600 ? 850 : 1000;
 }
-window.addEventListener("resize", resize);
+
+window.addEventListener("resize", () => {
+  resize();
+  initParticles(); // regenerate theo size mới
+});
+
 resize();
 
 /* =========================================
@@ -67,7 +187,7 @@ class Firework {
         vy: Math.sin(random(0, Math.PI * 2)) * random(1, 4),
         life: 1,
         decay: random(0.02, 0.05),
-        color: color,
+        color,
       });
     }
   }
@@ -96,22 +216,27 @@ class Firework {
 /* =========================================
    HẠT TRÁI TIM
    ========================================= */
-
 class HeartParticle {
   constructor(targetPoint) {
     this.target = targetPoint;
+
+    // spawn xa rồi hút về
     this.x = random(-width, width);
     this.y = random(-height, height);
     this.z = random(-1000, 1000);
+
     this.vx = 0;
     this.vy = 0;
     this.vz = 0;
+
+    // hạt to hơn -> tim đặc hơn
     this.size = random(1.2, 2.4);
+
     this.speed = random(0.05, 0.1);
     this.colorVar = random(-30, 30);
   }
 
-  update(time, beatScale) {
+  update(beatScale) {
     if (heartState === "exploded") {
       this.x += this.vx;
       this.y += this.vy;
@@ -120,9 +245,10 @@ class HeartParticle {
       this.vy *= 0.95;
       this.vz *= 0.95;
     } else {
-      let tx = this.target.x * beatScale;
-      let ty = this.target.y * beatScale;
-      let tz = this.target.z * beatScale;
+      const tx = this.target.x * beatScale;
+      const ty = this.target.y * beatScale;
+      const tz = this.target.z * beatScale;
+
       this.x += (tx - this.x) * this.speed;
       this.y += (ty - this.y) * this.speed;
       this.z += (tz - this.z) * this.speed;
@@ -130,23 +256,30 @@ class HeartParticle {
   }
 
   draw(ctx, cx, cy, rotX, rotY) {
-    // Xoay 3D
-    let x1 = this.x * Math.cos(rotY) - this.z * Math.sin(rotY);
-    let z1 = this.x * Math.sin(rotY) + this.z * Math.cos(rotY);
-    // rotX (nghiêng lên xuống) sẽ được cố định để tim đứng thẳng
-    let y1 = this.y * Math.cos(rotX) - z1 * Math.sin(rotX);
-    let z2 = this.y * Math.sin(rotX) + z1 * Math.cos(rotX);
+    // Rotate Y
+    const cosY = Math.cos(rotY),
+      sinY = Math.sin(rotY);
+    let x1 = this.x * cosY - this.z * sinY;
+    let z1 = this.x * sinY + this.z * cosY;
+
+    // Rotate X
+    const cosX = Math.cos(rotX),
+      sinX = Math.sin(rotX);
+    let y1 = this.y * cosX - z1 * sinX;
+    let z2 = this.y * sinX + z1 * cosX;
 
     if (z2 > -perspective + 10) {
-      let scale = perspective / (perspective + z2);
-      let x2d = x1 * scale + cx;
-      let y2d = y1 * scale + cy;
+      const scale = perspective / (perspective + z2);
+      const x2d = x1 * scale + cx;
+      const y2d = y1 * scale + cy;
 
-      let depth = (z2 + 500) / 1000;
-      let alpha = Math.min(1, Math.max(0.2, depth));
+      const depth = (z2 + 500) / 1000;
+      const alpha = Math.min(1, Math.max(0.2, depth));
+
       let r = HEART_COLOR.r + this.colorVar;
       let g = HEART_COLOR.g;
       let b = HEART_COLOR.b;
+
       if (depth > 0.7) {
         r += 40;
         g += 10;
@@ -155,93 +288,116 @@ class HeartParticle {
 
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
       ctx.beginPath();
-      ctx.arc(x2d, y2d, this.size * scale, 0, Math.PI * 2);
-      // const radius = Math.max(0.9, this.size * scale * 1.35);
-      // ctx.arc(x2d, y2d, radius, 0, Math.PI * 2);
+
+      // ✅ radius “đặc khít” hơn (không bị lỗ)
+      const radius = Math.max(0.9, this.size * scale * 1.35);
+      ctx.arc(x2d, y2d, radius, 0, Math.PI * 2);
+
       ctx.fill();
     }
   }
 }
 
-// THUẬT TOÁN TẠO KHỐI ĐẶC
+/* =========================================
+   TẠO KHỐI TIM (đứng thẳng swap trục)
+   ========================================= */
 function initParticles() {
   particles = [];
   while (particles.length < PARTICLE_COUNT) {
-    let x = random(-1.5, 1.5);
-    let y = random(-1.5, 1.5);
-    let z = random(-1.5, 1.5);
-    // Phương trình kiểm tra điểm nằm trong khối tim
-    let a = x * x + (9 / 4) * y * y + z * z - 1;
-    let check = a * a * a - x * x * z * z * z - (9 / 80) * y * y * z * z * z;
+    const x = random(-1.5, 1.5);
+    const y = random(-1.5, 1.5);
+    const z = random(-1.5, 1.5);
+
+    const a = x * x + (9 / 4) * y * y + z * z - 1;
+    const check = a * a * a - x * x * z * z * z - (9 / 80) * y * y * z * z * z;
 
     if (check <= 0) {
       // ✅ ĐỔI TRỤC để tim ĐỨNG (swap Y <-> Z)
-      let p = {
+      const p = {
         x: x * HEART_SIZE,
         y: -z * HEART_SIZE, // Z trở thành trục đứng
         z: y * HEART_SIZE, // Y trở thành chiều sâu
       };
-
       particles.push(new HeartParticle(p));
     }
   }
 }
 
 /* =========================================
-   LOOP & LOGIC
+   LOOP & LOGIC (deltaTime để ổn định tốc độ)
    ========================================= */
+let t = 0;
+let last = performance.now();
 
-let time = 0;
-function animate() {
+function animate(now) {
   requestAnimationFrame(animate);
-  ctx.clearRect(0, 0, width, height);
-  time += 0.015;
 
-  // Pháo hoa
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+  t += dt;
+
+  ctx.clearRect(0, 0, width, height);
+
+  // Pháo hoa (chỉ khi chưa nổ)
   if (Math.random() < 0.03 && heartState !== "exploded")
     fireworks.push(new Firework());
   fireworks.forEach((fw) => fw.update());
   fireworks.forEach((fw) => fw.draw(ctx));
   fireworks = fireworks.filter((fw) => !fw.isDead);
 
-  // Tim đập
-  let beat = Math.pow(Math.sin(time * 3.5), 3);
+  // Nhịp tim
+  const beat = Math.pow(Math.sin(t * 3.5), 3);
   let beatScale = 1 + beat * 0.05;
   if (heartState === "exploded") beatScale = 1;
 
-  // --- ĐIỀU CHỈNH GÓC XOAY ĐỂ TIM ĐỨNG THẲNG ---
-  rotationAngle += 0.02; // Tự động xoay tròn quanh trục thẳng đứng
+  // ===== tốc độ xoay ổn định theo FPS =====
+  const ROT_SPEED = 1.5; // rad/giây (tăng giảm tuỳ ý)
+  rotationAngle += dt * ROT_SPEED;
 
-  // Góc xoay quanh trục Y (Trái/Phải) - Cho phép tương tác nhẹ theo chuột
-  let targetRotY = rotationAngle + ((mouse.x - width / 2) / width) * 0.5;
+  // Tilt: mobile nhẹ hơn
+  const tiltPower = width < 600 ? 0.25 : 0.5;
+  const targetRotY =
+    rotationAngle + ((mouse.x - width / 2) / width) * tiltPower;
 
-  // Góc xoay quanh trục X (Lên/Xuống) - KHÓA CỨNG để tim đứng thẳng
-  // Đặt một góc nhỏ cố định (ví dụ 0.15) để nhìn từ hơi phía trên xuống cho đẹp
-  let targetRotX = 0;
+  // Đứng thẳng: rotX = 0 (hoặc 0.08 nếu thích nhìn hơi từ trên)
+  const targetRotX = width < 600 ? 0.05 : 0;
+
+  const cx = width / 2;
+  const cy = height / 2;
 
   particles.forEach((p) => {
-    p.update(time, beatScale);
-    p.draw(ctx, width / 2, height / 2, targetRotX, targetRotY);
+    p.update(beatScale);
+    p.draw(ctx, cx, cy, targetRotX, targetRotY);
   });
 
   // Cursor
-  if (
-    heartState === "exploded" ||
-    Math.sqrt(
-      Math.pow(mouse.x - width / 2, 2) + Math.pow(mouse.y - height / 2, 2)
-    ) < 250
-  ) {
+  const dist = Math.hypot(mouse.x - cx, mouse.y - cy);
+  if (heartState === "exploded" || dist < CLICK_RADIUS)
     canvas.style.cursor = "pointer";
-  } else {
-    canvas.style.cursor = "default";
-  }
+  else canvas.style.cursor = "default";
 }
 
-// EVENTS CLICK TOGGLE
+/* =========================================
+   EVENTS
+   ========================================= */
+
+// mouse move (desktop)
 window.addEventListener("mousemove", (e) => {
   mouse.x = e.clientX;
   mouse.y = e.clientY;
 });
+
+// touch move (mobile)
+window.addEventListener(
+  "touchmove",
+  (e) => {
+    const touch = e.touches && e.touches[0];
+    if (!touch) return;
+    mouse.x = touch.clientX;
+    mouse.y = touch.clientY;
+  },
+  { passive: true }
+);
 
 function toggleGallery() {
   if (isGalleryOpen) {
@@ -252,6 +408,8 @@ function toggleGallery() {
       isGalleryOpen = false;
       uiLayer.style.opacity = 1;
       heartState = "assemble";
+
+      // đẩy nhẹ để hút về đẹp
       particles.forEach((p) => {
         p.x += random(-500, 500);
         p.y += random(-500, 500);
@@ -262,59 +420,70 @@ function toggleGallery() {
     // MỞ
     heartState = "exploded";
     uiLayer.style.opacity = 0;
+
     particles.forEach((p) => {
-      let len = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z) || 1;
-      let force = random(15, 45);
+      const len = Math.hypot(p.x, p.y, p.z) || 1;
+      const force = random(15, 45);
       p.vx = (p.x / len) * force;
       p.vy = (p.y / len) * force;
       p.vz = (p.z / len) * force;
     });
+
     setTimeout(() => {
       isGalleryOpen = true;
       galleryOverlay.classList.remove("hidden");
       photoGrid.innerHTML = "";
+
       IMAGES.forEach((src, idx) => {
-        let div = document.createElement("div");
+        const div = document.createElement("div");
         div.className = "photo-card";
         div.style.setProperty("--r", random(-5, 5) + "deg");
-        div.style.animationDelay = idx * 0.15 + "s";
-        let img = document.createElement("img");
+        div.style.animationDelay = idx * 0.08 + "s";
+
+        const img = document.createElement("img");
         img.src = src;
+
+        // ✅ offline-safe fallback (không dùng URL ngoài)
         img.onerror = function () {
-          this.src = "https://via.placeholder.com/200?text=Error";
+          // 1x1 pixel transparent
+          this.src =
+            "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+          this.style.opacity = "0.15";
         };
+
         div.appendChild(img);
         photoGrid.appendChild(div);
       });
+
       setTimeout(() => galleryOverlay.classList.add("visible"), 50);
     }, 800);
   }
 }
 
+// ✅ Khi gallery đang mở: click window KHÔNG đóng (để click ảnh phóng to)
 window.addEventListener("click", (e) => {
-  // ✅ Khi gallery đang mở: KHÔNG toggleGallery nữa (để click ảnh không làm tim thu nhỏ)
   if (isGalleryOpen) return;
 
-  // Khi gallery chưa mở: click vào vùng tim mới mở
-  let dx = e.clientX - width / 2;
-  let dy = e.clientY - height / 2;
-  if (Math.sqrt(dx * dx + dy * dy) < 250) toggleGallery();
+  const dx = e.clientX - width / 2;
+  const dy = e.clientY - height / 2;
+  if (Math.sqrt(dx * dx + dy * dy) < CLICK_RADIUS) toggleGallery();
 });
 
-// Click vào nền tối (overlay) thì đóng, click vào nội dung thì không
+// Click nền tối overlay thì đóng, click content thì không
 galleryOverlay.addEventListener("click", (e) => {
   if (e.target === galleryOverlay) toggleGallery();
 });
-
-// Chặn click bên trong khung gallery không bị coi là click nền
 document.querySelector(".gallery-content").addEventListener("click", (e) => {
   e.stopPropagation();
 });
-
 closeBtn.addEventListener("click", (e) => {
   e.stopPropagation();
   toggleGallery();
 });
 
+/* =========================================
+   START
+   ========================================= */
+setupLightbox();
 initParticles();
-animate();
+requestAnimationFrame(animate);

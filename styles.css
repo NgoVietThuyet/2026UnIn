@@ -126,14 +126,16 @@ canvas {
 /* Polaroid Style Card */
 .photo-card {
   background: #fff;
-  padding: 10px 10px 40px 10px;
+  padding: 10px 10px 40px 10px; /* viền polaroid */
   border-radius: 2px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  width: 220px;
-  transform: rotate(-3deg);
-  transition: 0.3s;
+
+  /* ✅ KHÔNG FIX cứng width nữa */
+  width: fit-content;
+  max-width: 80vw; /* mobile không bị tràn */
   opacity: 0;
   animation: popIn 0.6s forwards;
+  transition: 0.3s;
 }
 
 .photo-card:nth-child(even) {
@@ -147,9 +149,14 @@ canvas {
 }
 
 .photo-card img {
-  width: 100%;
   display: block;
-  border: 1px solid #eee;
+  width: auto; /* quan trọng */
+  height: auto; /* quan trọng */
+  max-width: min(240px, 80vw); /* giới hạn để đẹp trên cả mobile */
+  max-height: 55vh; /* không cao quá màn hình */
+  object-fit: contain; /* không crop */
+  border: 2px solid #eee; /* viền bám theo ảnh */
+  background: #fafafa;
 }
 
 /* Nút Đóng */
